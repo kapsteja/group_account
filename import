@@ -1,0 +1,30 @@
+#!/bin/bash
+###############################################
+# Import existing account assignments into
+# Terraform state.
+#
+# One group + one admin permission set assigned
+# to multiple AWS accounts.
+###############################################
+# Set your IDs here
+GROUP_ID="84c83498-c001-7001-e8c5-bca55138f350"
+INSTANCE_ARN="arn:aws:sso:::instance/ssoins-72238332b3e97a22"
+PERMISSION_SET_ARN="arn:aws:sso:::permissionSet/ssoins-72238332b3e97a22/ps-2d087c889ed1ed37"
+# AWS Account IDs that already have the admin assignment
+ACCOUNT_IDS=(
+"472401338797"
+"902792996277"
+"279139051182"
+"521221133174"
+"390018456461"
+"654607264796"
+"194311055151"
+)
+echo "=== Importing account assignments ==="
+for ACCOUNT_ID in "${ACCOUNT_IDS[@]}"; do
+ echo "Importing assignment for account $ACCOUNT_ID..."
+ terraform import "aws_ssoadmin_account_assignment.group_assignments[\"$ACCOUNT_ID\"]" \
+   "${GROUP_ID},GROUP,${ACCOUNT_ID},AWS_ACCOUNT,${PERMISSION_SET_ARN},${INSTANCE_ARN}"
+done
+echo ""
+echo "=== Import complete. Run 'terraform plan' to verify ==="
